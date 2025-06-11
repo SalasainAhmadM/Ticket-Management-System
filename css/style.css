@@ -123,6 +123,12 @@ body {
     color: white;
 }
 
+.current {
+    background-color: rgba(25, 118, 210, 0.1); 
+    box-shadow: 0 0 5px rgba(25, 118, 210, 0.4);
+    padding: 6px;
+}
+
 .step-text {
     font-size: 14px;
     font-weight: 500;
@@ -366,4 +372,116 @@ tr:hover {
     color: #fff;
     font-weight: 600;
     pointer-events: none;
+}
+
+.edit-swal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.swal2-input, select.swal2-input {
+    width: 100%;
+    max-width: 300px;
+    font-size: 0.85em;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+}
+
+.swal2-input:focus, select.swal2-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+select.swal2-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 30px;
+}
+
+.swal2-input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+input[type="date"].swal2-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    gap: 10px;
+    box-sizing: border-box;
+    margin-left: 30px;
+}
+
+.controls-row .search-input,
+.controls-row .date-filter {
+    width: 180px;
+    max-width: 100%;
+    padding: 6px 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.controls-row .add-button {
+    margin-left: auto;
+    padding: 7px 18px;
+    font-size: 1rem;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+    margin-right: 60px;
+}
+
+.controls-row .add-button:hover {
+    background: #125ea7;
+}
+
+.controls-row-pull-request {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    margin-left: 30px;
+    box-sizing: border-box;
+}
+
+.controls-row-pull-request .search-input,
+.controls-row-pull-request .date-filter {
+    width: 180px;
+    max-width: 100%;
+    padding: 6px 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

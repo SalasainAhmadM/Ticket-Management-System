@@ -30,7 +30,7 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Import Employee Data</title>
+    <title>Jira Tickets - Ticket Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="icon" type="image/png" href="./img/jira.png">
@@ -55,9 +55,8 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                 </a>
             </div> -->
         </div>
-
         <div class="progress-bar">
-             <div class="step completed">
+             <div class="step completed current">
                 <div class="step-number">
                     <i class="fab fa-jira"></i>
                 </div>
@@ -74,9 +73,16 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
 
         <div style="display:none" class="success-message">
             <i class="fas fa-check-circle checkmark"></i>
-            The data is clean - no errors found!
+            Ticket Successfully updated!
         </div>
-
+        <div class="controls-row">
+           
+            <input type="text" class="search-input" id="search-input" placeholder="Search Tickets...">
+            <input type="date" class="date-filter" id="date-filter" placeholder="Filter by Date">
+             <button class="add-button" onclick="addTicket()">
+                <i class="fas fa-plus"></i> Add Ticket
+            </button>
+        </div>
         <div class="table-container">
             <table>
                 <thead>
@@ -112,7 +118,7 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                                 default: $statusClass = 'status-default';
                             }
 
-                            echo "<tr>
+                            echo "<tr id='{$row['id']}'>
                                     <td class='row-number'>{$rowNum}</td>
                                     <td>{$row['ticket_num']}</td>
                                     <td>{$row['description']}</td>
@@ -123,8 +129,8 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                                     <td><a href='{$row['url']}' class='ticket-url' title='{$row['url']}'>{$row['url']}</a></td>
                                     <td>
                                         <a href='#' title='Edit'><i class='fas fa-edit action-icon edit' onclick='editTicket(this)'></i></a>&nbsp;
-                                        <a href='#' title='Pull Request'><i class='fab fa-bitbucket action-icon pr' onclick='pullRequest()'></i></a>&nbsp;
-                                        <a href='#' title='Delete'><i class='fas fa-trash-alt action-icon delete' onclick='deleteTicket()'></i></a>
+                                        <a href='#' title='Pull Request'><i class='fab fa-bitbucket action-icon pr' onclick='pullRequest(this)'></i></a>&nbsp;
+                                        <a href='#' title='Delete'><i class='fas fa-trash-alt action-icon delete' onclick='deleteTicket(this)'></i></a>
                                     </td>
                                 </tr>";
                             $rowNum++;
@@ -133,7 +139,6 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                 </tbody>
 
             </table>
-        
            <?php
                 $totalPages = ceil($totalRows / $limit);
                 if ($totalPages > 1): ?>
@@ -164,5 +169,6 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./js/script.js"></script>
+    <script src="./js/navigator.js"></script>
 </body>
 </html>

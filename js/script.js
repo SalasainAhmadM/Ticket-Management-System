@@ -1,8 +1,72 @@
 function addTicket() {
     Swal.fire({
-        title: "Good job!",
-        text: "You clicked the button!",
-        icon: "success"
+        title: 'Add New Ticket',
+        html: `
+            <div class="edit-swal" style="display:flex; flex-direction:column; gap:6px;">
+                <label for="swal-ticketId">Ticket ID</label>
+                <input id="swal-ticketId" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="Ticket ID">
+                <label for="swal-description">Description</label>
+                <input id="swal-description" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="Description">
+                <label for="swal-assignee">Assignee</label>
+                <input id="swal-assignee" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="Assignee">
+
+                <label for="swal-status">Status</label>
+                <select id="swal-status" class="swal2-input" style="font-size: 0.85em; padding: 5px;">
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="in progress">In Progress</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+
+                <label for="swal-dateCreated">Date Created</label>
+                <input id="swal-dateCreated" type="date" class="swal2-input" style="font-size: 0.85em; padding: 5px;">
+                <label for="swal-dateFinished">Date Finished</label>
+                <input id="swal-dateFinished" type="date" class="swal2-input" style="font-size: 0.85em; padding: 5px;">
+                <label for="swal-url">URL</label>
+                <input id="swal-url" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="URL">
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Add Ticket',
+        focusConfirm: false,
+        preConfirm: () => {
+            return {
+                ticketId: document.getElementById('swal-ticketId').value,
+                description: document.getElementById('swal-description').value,
+                assignee: document.getElementById('swal-assignee').value,
+                status: document.getElementById('swal-status').value,
+                dateCreated: document.getElementById('swal-dateCreated').value,
+                dateFinished: document.getElementById('swal-dateFinished').value,
+                url: document.getElementById('swal-url').value
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const newTicket = result.value;
+
+            fetch('./endpoints/add_ticket.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newTicket)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const msg = document.querySelector('.success-message');
+                    msg.innerHTML = `<i class="fas fa-check-circle checkmark"></i> Ticket <strong>${newTicket.ticketId}</strong> successfully added!`;
+                    msg.style.display = 'block';
+                    setTimeout(() => {
+                        msg.style.display = 'none';
+                        location.reload();
+                    }, 6000);
+                } else {
+                    Swal.fire('Error', 'Add failed.', 'error');
+                }
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Request failed.', 'error');
+            });
+        }
     });
 }
 
@@ -34,10 +98,14 @@ function editTicket(element) {
         html: `
             <div class="edit-swal" style="display:flex; flex-direction:column; gap:6px;">
                 <input id="swal-rowId" type="hidden" value="${rowId}">
+                <label for="swal-ticketId">Ticket ID</label>
                 <input id="swal-ticketId" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="Ticket ID" value="${ticketId}">
+                <label for="swal-description">Description</label>
                 <input id="swal-description" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="Description" value="${description}">
+                <label for="swal-assignee">Assignee</label>
                 <input id="swal-assignee" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="Assignee" value="${assignee}">
 
+                <label for="swal-status">Status</label>
                 <select id="swal-status" class="swal2-input" style="font-size: 0.85em; padding: 5px;">
                     <option value="completed" ${status === 'completed' ? 'selected' : ''}>Completed</option>
                     <option value="in progress" ${status === 'in progress' ? 'selected' : ''}>In Progress</option>
@@ -45,8 +113,11 @@ function editTicket(element) {
                     <option value="urgent" ${status === 'urgent' ? 'selected' : ''}>Urgent</option>
                 </select>
 
+                <label for="swal-dateCreated">Date Created</label>
                 <input id="swal-dateCreated" type="date" class="swal2-input" style="font-size: 0.85em; padding: 5px;" value="${dateCreated}">
+                <label for="swal-dateFinished">Date Finished</label>
                 <input id="swal-dateFinished" type="date" class="swal2-input" style="font-size: 0.85em; padding: 5px;" value="${dateFinished}">
+                <label for="swal-url">URL</label>
                 <input id="swal-url" class="swal2-input" style="font-size: 0.85em; padding: 5px;" placeholder="URL" value="${url}">
             </div>
         `,

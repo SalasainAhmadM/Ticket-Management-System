@@ -22,7 +22,7 @@ $ticketsResult = mysqli_query($conn, $ticketsQuery);
 $countResult = mysqli_query($conn, "SELECT COUNT(*) as total FROM jira_tickets");
 $countRow = mysqli_fetch_assoc($countResult);
 $totalRows = $countRow['total'];
-$totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
+$totalColumns = mysqli_num_fields($ticketsResult);
 
 ?>
 <!DOCTYPE html>
@@ -139,7 +139,7 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                 </tbody>
 
             </table>
-           <?php
+          <?php
                 $totalPages = ceil($totalRows / $limit);
                 if ($totalPages > 1): ?>
                 <div class="pagination">
@@ -149,12 +149,13 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                         </a>
                     <?php endfor; ?>
                 </div>
-            <?php endif; ?>
+                <?php endif; ?>
 
             <div class="footer-info">
                 <?php
-                    $pageCount = ceil($totalRows / $limit);
-                    echo "$totalRows rows • $pageCount " . ($pageCount === 1 ? "page" : "pages");
+                $rowText = $totalRows == 1 ? "row" : "rows";
+                $pageText = $totalPages == 1 ? "page" : "pages";
+                echo "$totalRows $rowText • $totalPages $pageText";
                 ?>
             </div>
         </div>

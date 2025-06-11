@@ -382,7 +382,6 @@ tr:hover {
     gap: 6px;
     max-width: 400px;
     margin: 0 auto;
-    padding: 20px;
 }
 
 .swal2-input, select.swal2-input {
@@ -422,6 +421,19 @@ select.swal2-input {
 input[type="date"].swal2-input::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: 0.7;
+}
+
+label {
+    font-size: 0.5em;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+    width: 100%;
+    max-width: 300px;
+}
+
+label + .swal2-input {
+    margin-top: 4px;
 }
 
 .controls-row {
@@ -485,3 +497,4 @@ input[type="date"].swal2-input::-webkit-calendar-picker-indicator {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+

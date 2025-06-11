@@ -2,31 +2,34 @@
 session_start();
 require_once './conn/conn.php';
 date_default_timezone_set('Asia/Manila');
-$userQuery = "SELECT first_name, m_name, last_name,role FROM user WHERE id = 1 LIMIT 1";
+$userQuery = "SELECT first_name, m_name, last_name, role, image FROM user WHERE id = 1 LIMIT 1";
 $userResult = mysqli_query($conn, $userQuery);
 $userFullName = "Unknown User";
+$userImage = './img/jira.png';
 
 if ($userRow = mysqli_fetch_assoc($userResult)) {
-    $userFullName = $userRow['first_name'] . ' ' . $userRow['m_name']. '.' . ' ' . $userRow['last_name'];
-    $role = $userRow['role'] ?? 'User'; 
+    $userFullName = $userRow['first_name'] . ' ' . $userRow['m_name'] . '.' . ' ' . $userRow['last_name'];
+    $role = $userRow['role'] ?? 'User';
+    $userImage = !empty($userRow['image']) ? './img/' . $userRow['image'] : $userImage;
 }
 
 $limit = 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$ticketsQuery = "SELECT * FROM jira_tickets LIMIT $limit OFFSET $offset";
+$ticketsQuery = "SELECT * FROM pull_request LIMIT $limit OFFSET $offset";
 $ticketsResult = mysqli_query($conn, $ticketsQuery);
 
 // Get total count for footer
-$countResult = mysqli_query($conn, "SELECT COUNT(*) as total FROM jira_tickets");
+$countResult = mysqli_query($conn, "SELECT COUNT(*) as total FROM pull_request");
 $countRow = mysqli_fetch_assoc($countResult);
 $totalRows = $countRow['total'];
-$totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
+$totalColumns = mysqli_num_fields($ticketsResult);
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,16 +38,17 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
     <link rel="stylesheet" href="./css/style.css">
     <link rel="icon" type="image/png" href="./img/jira.png">
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <div class="header-left">
                 <div class="file-image">
                     <div class="file-image">
-                        <img src="./img/kaizoku.jpg" alt="File Image">
+                        <img src="<?php echo htmlspecialchars($userImage); ?>" alt="File Image">
                     </div>
                 </div>
-               <div class="header-name">
+                <div class="header-name">
                     <h1><?php echo htmlspecialchars($userFullName); ?></h1>
                     <span><?php echo htmlspecialchars($role); ?></span>
                 </div>
@@ -56,7 +60,7 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
             </div> -->
         </div>
         <div class="progress-bar">
-             <div class="step completed">
+            <div class="step completed">
                 <div class="step-number">
                     <i class="fab fa-jira"></i>
                 </div>
@@ -76,10 +80,10 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
             Ticket Successfully updated!
         </div>
         <div class="controls-row-pull-request">
-           
+
             <input type="text" class="search-input" id="search-input" placeholder="Search Tickets...">
             <input type="date" class="date-filter" id="date-filter" placeholder="Filter by Date">
-          
+
         </div>
         <div class="table-container">
             <table>
@@ -87,59 +91,87 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
                     <tr>
                         <th></th>
                         <th><i class="fas fa-ticket-alt column-icon text"></i>Ticket #</th>
-                        <th><i class="fas fa-align-left column-icon team"></i>Description</th>
-                        <th><i class="fas fa-user-circle column-icon department"></i>Assignee</th>
+                        <th><i class="fas fa-user-circle column-icon department"></i>Sir Jay</th>
+                        <th><i class="fas fa-user-circle column-icon department"></i>Ma'am Kerima</th>
+                        <th><i class="fas fa-user-circle column-icon department"></i>Ma'am Arlene</th>
                         <th><i class="fas fa-tasks column-icon number"></i>Status</th>
                         <th><i class="fas fa-calendar-plus column-icon date"></i>Date Created</th>
-                        <th><i class="fas fa-calendar-check column-icon manager"></i>Date Finished</th>
                         <th><i class="fas fa-link column-icon text"></i>URL</th>
                         <th><i class="fas fa-cogs column-icon action"></i>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                        $result = $ticketsResult;
+                    $query = "
+                        SELECT pr.*, jt.ticket_num 
+                        FROM pull_request pr
+                        JOIN jira_tickets jt ON pr.jira_ticket_id = jt.id
+                        ORDER BY pr.created_at DESC
+                    ";
+
+                    $result = mysqli_query($conn, $query);
+
+                    if (mysqli_num_rows($result) > 0) {
                         $rowNum = 1;
+                        while ($pullRequest = mysqli_fetch_assoc($result)) {
+                            $url = $pullRequest['url'] ?? '#';
+                            $status = $pullRequest['status'] ?? 'Pending';
+                            $dateCreated = date("d M y", strtotime($pullRequest['created_at']));
 
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            // Format date or show "-" if not set
-                            $dateCreated = date("d M y", strtotime($row['date_created']));
-                            $dateFinished = ($row['date_finished'] != '0000-00-00 00:00:00') ? date("d M y", strtotime($row['date_finished'])) : '-';
+                            $reviewer1Status = $pullRequest['reviewer_1'] ? 'Approved' : 'Not Approved Yet';
+                            $reviewer2Status = $pullRequest['reviewer_2'] ? 'Approved' : 'Not Approved Yet';
+                            $reviewer3Status = $pullRequest['reviewer_3'] ? 'Approved' : 'Not Approved Yet';
 
-                            // Assign badge class based on status
-                            $statusClass = '';
-                            switch (strtolower($row['status'])) {
-                                case 'completed': $statusClass = 'status-completed'; break;
-                                case 'in progress': $statusClass = 'status-in-progress'; break;
-                                case 'pending': $statusClass = 'status-pending'; break;
-                                case 'urgent': $statusClass = 'status-urgent'; break;
-                                default: $statusClass = 'status-default';
-                            }
+                            $reviewer1Class = $pullRequest['reviewer_1'] ? 'approved' : 'not-approved';
+                            $reviewer1Icon = $pullRequest['reviewer_1'] ? 'fa-thumbs-up' : 'fa-thumbs-down';
 
-                            echo "<tr id='{$row['id']}'>
-                                    <td class='row-number'>{$rowNum}</td>
-                                    <td>{$row['ticket_num']}</td>
-                                    <td>{$row['description']}</td>
-                                    <td>{$row['assignee']}</td>
-                                    <td><span class='status-badge {$statusClass}'>{$row['status']}</span></td>
-                                    <td>{$dateCreated}</td>
-                                    <td>{$dateFinished}</td>
-                                    <td><a href='{$row['url']}' class='ticket-url' title='{$row['url']}'>{$row['url']}</a></td>
-                                    <td>
-                                        <a href='#' title='Edit'><i class='fas fa-edit action-icon edit' onclick='editTicket(this)'></i></a>&nbsp;
-                                        <a href='#' title='Pull Request'><i class='fab fa-bitbucket action-icon pr' onclick='pullRequest(this)'></i></a>&nbsp;
-                                        <a href='#' title='Delete'><i class='fas fa-trash-alt action-icon delete' onclick='deleteTicket(this)'></i></a>
-                                    </td>
-                                </tr>";
+                            $reviewer2Class = $pullRequest['reviewer_2'] ? 'approved' : 'not-approved';
+                            $reviewer2Icon = $pullRequest['reviewer_2'] ? 'fa-thumbs-up' : 'fa-thumbs-down';
+
+                            $reviewer3Class = $pullRequest['reviewer_3'] ? 'approved' : 'not-approved';
+                            $reviewer3Icon = $pullRequest['reviewer_3'] ? 'fa-thumbs-up' : 'fa-thumbs-down';
+
+                            $ticketNum = $pullRequest['ticket_num'] ?? 'No Ticket Number';
+
+                            echo "<tr id='{$pullRequest['jira_ticket_id']}'>
+                        <td class='row-number'>{$rowNum}</td>
+                        <td>{$ticketNum}</td>
+                        <td>
+                            <span class='reviewer-status {$reviewer1Class}'>
+                                <i class='fas {$reviewer1Icon}'></i> {$reviewer1Status}
+                            </span>
+                        </td>
+                        <td>
+                            <span class='reviewer-status {$reviewer2Class}'>
+                                <i class='fas {$reviewer2Icon}'></i> {$reviewer2Status}
+                            </span>
+                        </td>
+                        <td>
+                            <span class='reviewer-status {$reviewer3Class}'>
+                                <i class='fas {$reviewer3Icon}'></i> {$reviewer3Status}
+                            </span>
+                        </td>
+                        <td><span class='status-badge'>{$status}</span></td>
+                        <td>{$dateCreated}</td>
+                        <td><a href='{$url}' class='ticket-url' title='{$url}'>{$url}</a></td>
+                        <td style='text-align: center;'>
+                            <a href='#' title='Edit'><i class='fas fa-edit action-icon edit' onclick='editPullRequest(this)'></i></a>&nbsp;
+                            <a href='#' title='Delete'><i class='fas fa-trash-alt action-icon delete' onclick='deletePullRequest(this)'></i></a>
+                        </td>
+                    </tr>";
+
                             $rowNum++;
                         }
+                    } else {
+                        echo "<tr><td colspan='9' class='empty-message'>No records found</td></tr>";
+                    }
                     ?>
                 </tbody>
-
             </table>
-           <?php
-                $totalPages = ceil($totalRows / $limit);
-                if ($totalPages > 1): ?>
+
+            <?php
+            $totalPages = ceil($totalRows / $limit);
+            if ($totalPages > 1): ?>
                 <div class="pagination">
                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                         <a href="?page=<?php echo $i; ?>" class="<?php echo $i == $page ? 'active' : ''; ?>">
@@ -151,8 +183,9 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
 
             <div class="footer-info">
                 <?php
-                    $pageCount = ceil($totalRows / $limit);
-                    echo "$totalRows rows • $pageCount " . ($pageCount === 1 ? "page" : "pages");
+                $rowText = $totalRows == 1 ? "row" : "rows";
+                $pageText = $totalPages == 1 ? "page" : "pages";
+                echo "$totalRows $rowText • $totalPages $pageText";
                 ?>
             </div>
         </div>
@@ -169,4 +202,5 @@ $totalColumns = mysqli_num_fields($ticketsResult); // counts columns dynamically
     <script src="./js/script.js"></script>
     <script src="./js/navigator.js"></script>
 </body>
+
 </html>

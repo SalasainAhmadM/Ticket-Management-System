@@ -83,6 +83,9 @@ $totalColumns = mysqli_num_fields($ticketsResult);
 
             <input type="text" class="search-input" id="search-input" placeholder="Search Tickets...">
             <input type="date" class="date-filter" id="date-filter" placeholder="Filter by Date">
+            <button class="reset-button" onclick="resetIndex()">
+                <i class="fas fa-refresh"></i>
+            </button>
             <button class="add-button" onclick="addTicket()">
                 <i class="fas fa-plus"></i> Add Ticket
             </button>
@@ -107,7 +110,8 @@ $totalColumns = mysqli_num_fields($ticketsResult);
                     $result = $ticketsResult;
                     $rowNum = 1;
 
-                    while ($row = mysqli_fetch_assoc($result)) {
+                    if (mysqli_num_rows($result) > 0) {
+                         while ($row = mysqli_fetch_assoc($result)) {
                         // Format date or show "-" if not set
                         $dateCreated = date("d M y", strtotime($row['date_created']));
                         $dateFinished = ($row['date_finished'] != '0000-00-00 00:00:00') ? date("d M y", strtotime($row['date_finished'])) : '-';
@@ -148,6 +152,9 @@ $totalColumns = mysqli_num_fields($ticketsResult);
                                 </tr>";
                         $rowNum++;
                     }
+                    } else {
+                        echo "<tr class='empty-message'><td colspan='9' class='empty-message'>No data found</td></tr>";
+                    }
                     ?>
                 </tbody>
 
@@ -184,6 +191,7 @@ $totalColumns = mysqli_num_fields($ticketsResult);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./js/script.js"></script>
     <script src="./js/navigator.js"></script>
+    <script src="./js/sweetalert.js"></script>
 </body>
 
 </html>

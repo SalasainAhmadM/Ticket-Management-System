@@ -83,6 +83,9 @@ $totalColumns = mysqli_num_fields($ticketsResult);
 
             <input type="text" class="search-input" id="search-input" placeholder="Search Tickets...">
             <input type="date" class="date-filter" id="date-filter" placeholder="Filter by Date">
+            <button class="reset-button" onclick="resetPRPage()">
+                <i class="fas fa-refresh"></i>
+            </button>
 
         </div>
         <div class="table-container">
@@ -136,24 +139,24 @@ $totalColumns = mysqli_num_fields($ticketsResult);
                             echo "<tr id='{$pullRequest['jira_ticket_id']}'>
                         <td class='row-number'>{$rowNum}</td>
                         <td>{$ticketNum}</td>
-                        <td>
+                        <td class='reviewer-td-status'>
                             <span class='reviewer-status {$reviewer1Class}'>
                                 <i class='fas {$reviewer1Icon}'></i> {$reviewer1Status}
                             </span>
                         </td>
-                        <td>
+                        <td class='reviewer-td-status'>
                             <span class='reviewer-status {$reviewer2Class}'>
                                 <i class='fas {$reviewer2Icon}'></i> {$reviewer2Status}
                             </span>
                         </td>
-                        <td>
+                        <td class='reviewer-td-status'>
                             <span class='reviewer-status {$reviewer3Class}'>
                                 <i class='fas {$reviewer3Icon}'></i> {$reviewer3Status}
                             </span>
                         </td>
                         <td><span class='status-badge'>{$status}</span></td>
                         <td>{$dateCreated}</td>
-                        <td><a href='{$url}' class='ticket-url' title='{$url}'>{$url}</a></td>
+                        <td><a href='{$url}' class='ticket-url' title='{$url}' target='_blank'>{$url}</a></td>
                         <td style='text-align: center;'>
                             <a href='#' title='Edit'><i class='fas fa-edit action-icon edit' onclick='editPullRequest(this)'></i></a>&nbsp;
                             <a href='#' title='Delete'><i class='fas fa-trash-alt action-icon delete' onclick='deletePullRequest(this)'></i></a>
@@ -163,7 +166,7 @@ $totalColumns = mysqli_num_fields($ticketsResult);
                             $rowNum++;
                         }
                     } else {
-                        echo "<tr><td colspan='9' class='empty-message'>No records found</td></tr>";
+                        echo "<tr><td colspan='9' class='empty-message'>No data found</td></tr>";
                     }
                     ?>
                 </tbody>
@@ -201,6 +204,7 @@ $totalColumns = mysqli_num_fields($ticketsResult);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./js/script.js"></script>
     <script src="./js/navigator.js"></script>
+    <script src="./js/sweetalert.js"></script>
 </body>
 
 </html>

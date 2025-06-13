@@ -457,6 +457,15 @@ label + .swal2-input {
     border-radius: 4px;
 }
 
+.reset-button {
+    padding: 7px;
+    font-size: 1rem;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 .controls-row .add-button {
     margin-left: auto;
     padding: 7px 18px;
@@ -503,6 +512,10 @@ label + .swal2-input {
     color: #999;
     font-size: 1.1em;
     padding: 20px;
+}
+
+.reviewer-td-status {
+    text-align: center;
 }
 
 .reviewer-status {
